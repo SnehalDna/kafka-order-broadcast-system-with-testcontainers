@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3️⃣ Build application (no tests yet)
+      - name: Build application
+        run: mvn clean package -DskipTests
+
+      # 4️⃣ Start Kafka (Docker Compose)
+      - name: Start Kafka
+        run: docker compose up -d kafka
+
+      # 5️⃣ Wait for Kafka to be ready
+      - name: Wait for Kafka
+        run: |
+          echo "Waiting for Kafka to be ready..."
+          sleep 20
+
+      # 6️⃣ Start Spring Boot application
+      - name: Start Spring Boot app
+        run: |
+          nohup mvn spring-boot:run > app.log 2>&1 &
+          sleep 25
+
+      # 7️⃣ Run tests (unit now, E2E later)
+      - name: Run tests (placeholder for E2E)
+        run: |
+          echo "Running tests..."
+          mvn test
+          # Future:
+          # mvn verify -P e2e
+
+      # 8️⃣ Print app logs on failure (debugging help)
+      - name: Show application logs if failed
+        if: failure()
+        run: cat app.log
+
+      # 9️⃣ Tear down Docker and cleanup (ALWAYS runs)
+      - name: Shutdown Docker resources
+        if: always()
+        run: |
+          docker compose down -v
+          docker system prune -af
