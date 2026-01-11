@@ -1,4 +1,5 @@
-package com.github.SnehalDna.kafka_order_system;
+package com.github.SnehalDna.kafkaOrderSystem;
+
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

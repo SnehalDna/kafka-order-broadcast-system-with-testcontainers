@@ -16,4 +16,8 @@ public class OrderController {
         orderProducer.sendOrder(order);
         return "Order " + order.getOrderId() + " placed successfully!";
     }
+    @GetMapping("/ping")
+    public String ping() {
+        return "pong";
+    }
 }
